@@ -2,30 +2,21 @@ pipeline {
     agent any
 
     stages {
-        stage('Welcome') {
+        stage('Welcome to nitish docker') {
             steps {
-                echo '🚀 Aapka Jenkins ki duniya me swaagat hai!'
-                echo 'Welcome Nitish 👑 — Pipeline successfully started'
+                echo 'Jenkins + Docker pipeline start'
             }
         }
 
         stage('Clone') {
             steps {
-                echo '📦 Code clone ho raha hai...'
                 checkout scm
             }
         }
 
-        stage('Build') {
+        stage('Check Docker nitish docker running') {
             steps {
-                echo '⚙️ Build process start ho gaya...'
-                sh 'echo Build done successfully ✅'
-            }
-        }
-
-        stage('Finish') {
-            steps {
-                echo '🎉 Pipeline completed successfully!'
+                sh 'docker --version'
             }
         }
     }
