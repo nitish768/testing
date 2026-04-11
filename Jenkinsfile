@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     stages {
-        stage('Welcome to NitishDocker') {
+        stage('Welcome') {
             steps {
                 echo 'Jenkins + Docker pipeline start'
             }
@@ -11,6 +11,12 @@ pipeline {
         stage('Check Docker') {
             steps {
                 sh '/usr/local/bin/docker --version'
+            }
+        }
+
+        stage('Build Image') {
+            steps {
+                sh '/usr/local/bin/docker build -t nitish-nginx-app .'
             }
         }
     }
