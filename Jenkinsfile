@@ -2,19 +2,13 @@ pipeline {
     agent any
 
     stages {
-        stage('Welcome to nitish docker') {
+        stage('Welcome') {
             steps {
                 echo 'Jenkins + Docker pipeline start'
             }
         }
 
-        stage('Clone') {
-            steps {
-                checkout scm
-            }
-        }
-
-        stage('Check Docker nitish docker running') {
+        stage('Check Docker') {
             steps {
                 sh 'docker --version'
             }
