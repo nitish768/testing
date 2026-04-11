@@ -16,7 +16,11 @@ pipeline {
 
         stage('Build Image') {
             steps {
-                sh '/usr/local/bin/docker build -t nitish-nginx-app .'
+                sh '''
+                    mkdir -p $WORKSPACE/.docker-tmp
+                    echo '{}' > $WORKSPACE/.docker-tmp/config.json
+                    DOCKER_CONFIG=$WORKSPACE/.docker-tmp /usr/local/bin/docker build -t nitish-nginx-app .
+                '''
             }
         }
     }
