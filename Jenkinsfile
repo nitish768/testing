@@ -1,6 +1,10 @@
 pipeline {
     agent { label 'nitishbabu' }
 
+    environment {
+        PATH = "/snap/bin:/usr/local/bin:/usr/bin:/bin:$PATH"
+    }
+
     stages {
 
         stage('Check Node') {
@@ -58,7 +62,6 @@ pipeline {
                 sh '''
                 echo "Pods status:"
                 kubectl get pods
-                echo "nitish singh deployment "
                 '''
             }
         }
