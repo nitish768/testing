@@ -58,6 +58,7 @@ pipeline {
                 sh '''
                 echo "Pods status:"
                 kubectl get pods
+                echo "nitish singh deployment "
                 '''
             }
         }
