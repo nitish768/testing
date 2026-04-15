@@ -1,5 +1,5 @@
 pipeline {
-    agent { label 'vm-agent' }
+    agent { label 'vm-ssh' }
 
     stages {
         stage('Check Node') {
