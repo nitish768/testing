@@ -63,7 +63,27 @@ pipeline {
                 echo "Pods status:"
                 kubectl get pods
                 '''
+        
             }
         }
-    }
-}
+
+        stage('Expose Service') {
+            steps {
+                sh '''
+                echo "Exposing nginx service..."
+
+                kubectl expose deployment nginx-deployment \
+                --type=NodePort \
+                --port=80 || true
+                '''
+            }
+        }
+
+        stage('Check Service') {
+            steps {
+                sh '''
+                echo "Services:"
+                kubectl get svc
+                '''
+           }
+        }
