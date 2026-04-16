@@ -2,7 +2,7 @@ pipeline {
     agent { label 'nitishbabu' }
 
     environment {
-        PATH = "/snap/bin:/usr/local/bin:/usr/bin:/bin:$PATH"
+        PATH = "/usr/bin:/usr/local/bin:/snap/bin:/usr/bin:/bin:$PATH"
         IMAGE_NAME = "nitish768/my-nginx-app"
         TAG = "latest"
     }
@@ -18,6 +18,7 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 sh '''
+                echo "Building Docker image..."
                 docker build -t $IMAGE_NAME:$TAG .
                 '''
             }
@@ -25,15 +26,22 @@ pipeline {
 
         stage('Docker Login') {
             steps {
-                sh '''
-                docker login -u <your-username> -p <your-password>
-                '''
+                withCredentials([usernamePassword(
+                    credentialsId: 'docker-hub-cred',
+                    usernameVariable: 'DOCKER_USER',
+                    passwordVariable: 'DOCKER_PASS'
+                )]) {
+                    sh """
+                    echo \$DOCKER_PASS | docker login -u \$DOCKER_USER --password-stdin
+                    """
+                }
             }
         }
 
         stage('Push Image') {
             steps {
                 sh '''
+                echo "Pushing image to Docker Hub..."
                 docker push $IMAGE_NAME:$TAG
                 '''
             }
@@ -42,6 +50,7 @@ pipeline {
         stage('Deploy to Kubernetes') {
             steps {
                 sh '''
+                echo "Updating Kubernetes deployment..."
                 kubectl set image deployment/nginx-deployment \
                 nginx=$IMAGE_NAME:$TAG
                 '''
@@ -51,6 +60,7 @@ pipeline {
         stage('Verify') {
             steps {
                 sh '''
+                echo "Checking pods..."
                 kubectl get pods
                 '''
             }
