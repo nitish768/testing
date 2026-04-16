@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         PATH = "/usr/bin:/usr/local/bin:/snap/bin:/usr/bin:/bin:$PATH"
-        IMAGE_NAME = "nitish768/my-nginx-app"
+        IMAGE_NAME = "nitish768/nitish-nginx-app"
         TAG = "latest"
     }
 
