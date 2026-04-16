@@ -3,68 +3,47 @@ pipeline {
 
     environment {
         PATH = "/snap/bin:/usr/local/bin:/usr/bin:/bin:$PATH"
+        IMAGE_NAME = "nitish768/my-nginx-app"
+        TAG = "latest"
     }
 
     stages {
 
-        stage('Check Node') {
+        stage('Checkout Code') {
+            steps {
+                checkout scm
+            }
+        }
+
+        stage('Build Docker Image') {
             steps {
                 sh '''
-                echo "Running on:"
-                hostname
+                docker build -t $IMAGE_NAME:$TAG .
                 '''
             }
         }
 
-        stage('Check Kubernetes') {
+        stage('Docker Login') {
             steps {
                 sh '''
-                echo "Checking cluster..."
-                kubectl get nodes
+                docker login -u <your-username> -p <your-password>
                 '''
             }
         }
 
-        stage('Deploy Nginx') {
+        stage('Push Image') {
             steps {
                 sh '''
-                echo "Deploying nginx..."
-
-                cat <<EOF > nginx.yaml
-                apiVersion: apps/v1
-                kind: Deployment
-                metadata:
-                  name: nginx-deployment
-                spec:
-                  replicas: 2
-                  selector:
-                    matchLabels:
-                      app: nginx
-                  template:
-                    metadata:
-                      labels:
-                        app: nginx
-                    spec:
-                      containers:
-                      - name: nginx
-                        image: nginx
-                        ports:
-                        - containerPort: 80
-                EOF
-
-                kubectl apply -f nginx.yaml
+                docker push $IMAGE_NAME:$TAG
                 '''
             }
         }
 
-        stage('Expose Service') {
+        stage('Deploy to Kubernetes') {
             steps {
                 sh '''
-                echo "Exposing nginx service..."
-
-                kubectl expose deployment nginx-deployment \
-                  --type=NodePort \
-                  --port=80 || true
+                kubectl set image deployment/nginx-deployment \
+                nginx=$IMAGE_NAME:$TAG
                 '''
             }
         }
@@ -72,11 +51,7 @@ pipeline {
         stage('Verify') {
             steps {
                 sh '''
-                echo "Pods:"
                 kubectl get pods
-
-                echo "Services:"
-                kubectl get svc
                 '''
             }
         }
