@@ -2,9 +2,9 @@ pipeline {
     agent { label 'nitishbabu' }
 
     environment {
-        PATH = "/usr/bin:/usr/local/bin:/snap/bin:/usr/bin:/bin:$PATH"
-        IMAGE_NAME = "nitishsingh/jenkins"
-        TAG = "latest"
+    PATH = "/usr/bin:/usr/local/bin:/snap/bin:/usr/bin:/bin:$PATH"
+    IMAGE_NAME = "nitishsingh/jenkins"
+    TAG = "${BUILD_NUMBER}"
     }
 
     stages {
