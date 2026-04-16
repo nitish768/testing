@@ -1,10 +1,14 @@
 pipeline {
     agent { label 'nitishbabu' }
 
+    parameters {
+        choice(name: 'ENV', choices: ['nitish-dev', 'nitish-prod'], description: 'Select Environment')
+    }
+
     environment {
-    PATH = "/usr/bin:/usr/local/bin:/snap/bin:/usr/bin:/bin:$PATH"
-    IMAGE_NAME = "nitishsingh/jenkins"
-    TAG = "${BUILD_NUMBER}"
+        PATH = "/usr/bin:/usr/local/bin:/snap/bin:/usr/bin:/bin:$PATH"
+        IMAGE_NAME = "nitishsingh/jenkins"
+        TAG = "${BUILD_NUMBER}"
     }
 
     stages {
@@ -49,20 +53,20 @@ pipeline {
 
         stage('Deploy to Kubernetes') {
             steps {
-                sh '''
-                echo "Updating Kubernetes deployment..."
+                sh """
+                echo "Deploying to ${params.ENV}..."
                 kubectl set image deployment/nginx-deployment \
-                nginx=$IMAGE_NAME:$TAG
-                '''
+                nginx=$IMAGE_NAME:$TAG -n ${params.ENV}
+                """
             }
         }
 
         stage('Verify') {
             steps {
-                sh '''
-                echo "Checking pods..."
-                kubectl get pods
-                '''
+                sh """
+                echo "Checking pods in ${params.ENV}..."
+                kubectl get pods -n ${params.ENV}
+                """
             }
         }
     }
