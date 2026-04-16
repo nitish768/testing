@@ -45,7 +45,7 @@ pipeline {
         stage('Push Image') {
             steps {
                 sh '''
-                echo "Pushing image to Docker Hub..."
+                echo "Pushing image..."
                 docker push $IMAGE_NAME:$TAG
                 '''
             }
@@ -55,8 +55,28 @@ pipeline {
             steps {
                 sh """
                 echo "Deploying to ${params.ENV}..."
-                kubectl set image deployment/nginx-deployment \
-                nginx=$IMAGE_NAME:$TAG -n ${params.ENV}
+
+                cat <<EOF | kubectl apply -n ${params.ENV} -f -
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - name: nginx
+        image: $IMAGE_NAME:$TAG
+        ports:
+        - containerPort: 80
+EOF
                 """
             }
         }
